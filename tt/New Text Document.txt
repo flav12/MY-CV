@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flavian Irungu Wanjiku - Interactive CV Infographic</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .section {
+            background-color: #fff;
+            border-radius: 15px; /* Rounded edges */
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .section:hover {
+            transform: scale(1.02); /* Slight zoom on hover */
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        h2 {
+            color: #3498db;
+            font-size: 1.2em;
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+        .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            background-color: #3498db;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -1px;
+        }
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+        }
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            right: -8px;
+            background-color: #fff;
+            border: 2px solid #3498db;
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        .left {
+            left: 0;
+        }
+        .right {
+            left: 50%;
+        }
+        .right::after {
+            left: -8px;
+        }
+        .content {
+            padding: 5px 10px;
+            background-color: white;
+            position: relative;
+            border-radius: 6px;
+        }
+        .chart-container {
+            position: relative;
+            height: 200px;
+            width: 100%;
+        }
+        .skill-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .skill-bar {
+            flex-grow: 1;
+            height: 10px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            margin: 0 10px;
+            overflow: hidden;
+        }
+        .skill-level {
+            height: 100%;
+            background-color: #3498db;
+            border-radius: 5px;
+        }
+        .mode-toggle {
+            position: fixed;
+            top: 10px;
+            right: 210px; /* Adjust this value to position it to the left of the video */
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1001; /* Ensure it's above the video */
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: #ffffff;
+        }
+        .dark-mode .section {
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+        .dark-mode h1, .dark-mode h2 {
+            color: #3498db;
+        }
+        .dark-mode .content {
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+        .star {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background-color: #fff;
+            border-radius: 50%;
+        }
+        .shooting-star {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background-color: #fff;
+            border-radius: 50%;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        @keyframes shoot {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(300px) translateY(300px); opacity: 0; }
+        }
+        .bubble {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: rgba(52, 152, 219, 0.3);
+            border-radius: 50%;
+        }
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0); }
+        }
+        img {
+            width: 50px; /* Adjust size as needed */
+            height: auto;
+            border-radius: 50%; /* Round image */
+            margin-right: 10px;
+        }
+        .hover-text {
+            font-size: 0.8em;
+            color: #666;
+            display: none;
+            position: absolute;
+            background: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .hover-container {
+            position: relative;
+            display: inline-block;
+        }
+        .hover-container:hover .hover-text {
+            display: block;
+        }
+        .thank-you {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1em;
+            color: #333;
+            transition: color 0.3s;
+        }
+        .dark-mode .thank-you {
+            color: #ffffff;
+        }
+        .download-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .download-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        .download-link:hover {
+            background-color: #2980b9;
+        }
+        #countdown {
+            display: none;
+            font-size: 1em;
+            margin-top: 10px;
+        }
+        .work-experience-container {
+            height: 300px;  /* Increased height */
+            margin-bottom: 30px;  /* Add some space below the chart */
+        }
+        .work-experience-chart {
+            background-color: rgba(255, 255, 255, 0.1);  /* Slight background for visibility */
+            border-radius: 10px;  /* Rounded corners */
+            padding: 10px;  /* Some padding around the chart */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);  /* Subtle shadow for depth */
+        }
+        .floating-video {
+            position: fixed;
+            top: 40px; /* Adjust this to move the video down slightly */
+            right: 20px;
+            width: 180px;
+            height: 320px;
+            z-index: 1000;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: move;
+        }
+        .floating-video iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .close-video {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            line-height: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .audio-control {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            line-height: 30px;
+            text-align: center;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .audio-control:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="mode-toggle">
+        <i class="fas fa-sun"></i>
+    </div>
+    
+    <div class="download-container">
+        <a href="FLAVIAN IRUNGU CV.pdf" download id="downloadLink" class="download-link">Click me to download FLAVIAN IRUNGU CV.pdf</a>
+        <div id="countdown"></div>
+    </div>
+    <h1>
+        <img id="profileImage" src="FLAVIAN.png" alt="Flavian Irungu Wanjiku"> <!-- Replace with your image URL -->
+        Flavian Irungu Wanjiku
+    </h1>
+    <div class="container">
+        <div class="section">
+            <h2>Personal Details</h2>
+            <canvas id="personalDetailsChart"></canvas>
+        </div>
+        <div class="section">
+            <h2>Education</h2>
+            <div class="timeline">
+                <div class="timeline-item left">
+                    <div class="content">
+                        <h3>Diploma in Computer Science</h3>
+                        <p>Chuka University, 2019 - 2020</p>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="content">
+                        <h3>Certificate in Computer Science</h3>
+                        <p>Chuka University, 2018 - 2019</p>
+                    </div>
+                </div>
+                <div class="timeline-item left">
+                    <div class="content">
+                        <h3>Certificate in Computer Packages</h3>
+                        <p>Nairobi, 2018</p>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="content">
+                        <h3>'O' Level Certificate</h3>
+                        <p>Kairi-ini Secondary School, 2014-2018</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Work Experience</h2>
+            <div class="work-experience-container">
+                <canvas id="workExperienceChart" class="work-experience-chart"></canvas>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Technical Skills</h2>
+            <div id="technicalSkills"></div>
+        </div>
+        <div class="section">
+            <h2>TV Professional Skills</h2>
+            <canvas id="tvSkillsChart"></canvas>
+        </div>
+        <div class="section">
+            <h2>Awards and Achievements</h2>
+            <canvas id="awardsChart"></canvas>
+        </div>
+    </div>
+
+    <div class="floating-video" id="floatingVideo">
+        <button class="close-video" id="closeVideo">×</button>
+        <button class="audio-control" id="audioControl"><i class="fas fa-volume-up"></i></button>
+        <iframe id="youtubeVideo" src="https://www.youtube.com/embed/GEZfJMhMh_4?autoplay=1&mute=0&controls=1" 
+                allow="autoplay; encrypted-media" 
+                allowfullscreen>
+        </iframe>
+    </div>
+
+    <script>
+        Chart.register(ChartDataLabels);
+
+        // Personal Details Chart
+        const personalDetailsChart = new Chart(document.getElementById('personalDetailsChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Work', 'Sleep', 'Leisure', 'Study'],
+                datasets: [{
+                    data: [40, 33, 17, 10],
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    datalabels: {
+                        color: '#fff',
+                        font: { weight: 'bold' },
+                        formatter: (value) => `${value}%`
+                    }
+                }
+            }
+        });
+
+        // Work Experience Chart
+        const workExperienceChart = new Chart(document.getElementById('workExperienceChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Favour of God TV', 'Give Hope TV', 'Freelancer', 'Cyber Café'],
+                datasets: [{
+                    label: 'Duration (months)',
+                    data: [36, 5, 4, 13],
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                    borderColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,  // This allows the chart to fill the container
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            font: {
+                                size: 14  // Larger font size for y-axis labels
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 14  // Larger font size for x-axis labels
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false  // Hide the legend as it's not needed for this chart
+                    },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        formatter: Math.round,
+                        font: {
+                            weight: 'bold',
+                            size: 16  // Larger font size for data labels
+                        }
+                    }
+                }
+            }
+        });
+
+        // Technical Skills
+        const technicalSkills = [
+            { name: 'Programming', level: 90 },
+            { name: 'Frameworks', level: 85 },
+            { name: 'Databases', level: 80 },
+            { name: 'Tools', level: 95 },
+            { name: 'Data Analysis', level: 75 }
+        ];
+
+        const skillsContainer = document.getElementById('technicalSkills');
+        technicalSkills.forEach(skill => {
+            const skillItem = document.createElement('div');
+            skillItem.className = 'skill-item';
+            skillItem.innerHTML = `
+                <span>${skill.name}</span>
+                <div class="skill-bar">
+                    <div class="skill-level" style="width: ${skill.level}%"></div>
+                </div>
+                <span>${skill.level}%</span>
+            `;
+            skillsContainer.appendChild(skillItem);
+        });
+
+        // TV Professional Skills Chart
+        const tvSkillsChart = new Chart(document.getElementById('tvSkillsChart'), {
+            type: 'radar',
+            data: {
+                labels: ['Editing', 'Camera Operation', 'Lighting', 'Sound', 'Directing'],
+                datasets: [{
+                    label: 'Skill Level',
+                    data: [95, 90, 85, 80, 75],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    pointBackgroundColor: 'rgb(54, 162, 235)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(54, 162, 235)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scale: { ticks: { beginAtZero: true, max: 100 } },
+                plugins: {
+                    datalabels: {
+                        formatter: (value) => `${value}%`,
+                        color: '#fff',
+                        font: { weight: 'bold' }
+                    }
+                }
+            }
+        });
+
+        // Awards and Achievements Chart
+        const awardsChart = new Chart(document.getElementById('awardsChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Best Employee', 'Innovation Award', 'Perfect Attendance'],
+                datasets: [{
+                    data: [3, 2, 1],
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    datalabels: {
+                        formatter: (value) => `${value}`,
+                        color: '#fff',
+                        font: { weight: 'bold' }
+                    }
+                }
+            }
+        });
+
+        // Dark mode toggle
+        const modeToggle = document.querySelector('.mode-toggle');
+        const body = document.body;
+        let isDarkMode = false;
+
+        modeToggle.addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            body.classList.toggle('dark-mode');
+            modeToggle.innerHTML = isDarkMode ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+            
+            if (isDarkMode) {
+                createStars();
+                createShootingStars();
+                removeBubbles();
+            } else {
+                removeStars();
+                removeShootingStars();
+                createBubbles();
+            }
+        });
+
+        function createStars() {
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `${Math.random() * 100}vh`;
+                star.style.animation = `twinkle ${Math.random() * 3 + 1}s infinite`;
+                body.appendChild(star);
+            }
+        }
+
+        function createShootingStars() {
+            setInterval(() => {
+                const shootingStar = document.createElement('div');
+                shootingStar.classList.add('shooting-star');
+                shootingStar.style.left = `${Math.random() * 100}vw`;
+                shootingStar.style.top = `${Math.random() * 100}vh`;
+                shootingStar.style.animation = `shoot 1s linear forwards`;
+                body.appendChild(shootingStar);
+                setTimeout(() => shootingStar.remove(), 1000);
+            }, 2000);
+        }
+
+        function removeStars() {
+            document.querySelectorAll('.star').forEach(star => star.remove());
+        }
+
+        function removeShootingStars() {
+            document.querySelectorAll('.shooting-star').forEach(star => star.remove());
+        }
+
+        function createBubbles() {
+            for (let i = 0; i < 20; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                bubble.style.left = `${Math.random() * 100}vw`;
+                bubble.style.top = `${Math.random() * 100}vh`;
+                bubble.style.animation = `float ${Math.random() * 5 + 3}s infinite`;
+                body.appendChild(bubble);
+            }
+        }
+
+        function removeBubbles() {
+            document.querySelectorAll('.bubble').forEach(bubble => bubble.remove());
+        }
+
+        // Initial bubble creation for light mode
+        createBubbles();
+
+        // Download link functionality
+        const downloadLink = document.getElementById('downloadLink');
+        const countdown = document.getElementById('countdown');
+        let countdownInterval;
+    
+        downloadLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            this.style.display = 'none';
+            countdown.style.display = 'block';
+            let secondsLeft = 9;
+    
+            countdownInterval = setInterval(function() {
+                countdown.textContent = `Download will start in ${secondsLeft} seconds...`;
+                secondsLeft--;
+    
+                if (secondsLeft < 0) {
+                    clearInterval(countdownInterval);
+                    countdown.style.display = 'none';
+                    downloadLink.style.display = 'inline-block';
+                    window.location.href = downloadLink.href;
+                }
+            }, 1000);
+        });
+
+        // Clickable link to CV
+        const clickMeLink = document.createElement('a');
+        clickMeLink.href = 'https://online.fliphtml5.com/slsxy/qgho/';
+        clickMeLink.textContent = 'PLEASE CLICK ME TO SEE MY CV IN FULL TEXT';
+        clickMeLink.style.display = 'block';
+        clickMeLink.style.textAlign = 'center';
+        clickMeLink.style.margin = '20px auto';
+        clickMeLink.style.padding = '10px 20px';
+        clickMeLink.style.backgroundColor = '#3498db';
+        clickMeLink.style.color = '#fff';
+        clickMeLink.style.textDecoration = 'none';
+        clickMeLink.style.borderRadius = '5px';
+        clickMeLink.className = 'hover-container';
+        clickMeLink.innerHTML += '<span class="hover-text">Open my CV</span>'; // Hover text
+        document.body.appendChild(clickMeLink);
+
+        // Thank you message
+        const thankYouMessage = document.createElement('div');
+        thankYouMessage.className = 'thank-you';
+        thankYouMessage.textContent = 'Thanks for taking time to view my CV. I believe I will be of great help in your company. Feel free to contact me on: +254713 802 011';
+        document.body.appendChild(thankYouMessage);
+
+        // Floating video functionality
+        const floatingVideo = document.getElementById('floatingVideo');
+        const closeVideo = document.getElementById('closeVideo');
+        let isDragging = false;
+        let currentX;
+        let currentY;
+        let initialX;
+        let initialY;
+        let xOffset = 0;
+        let yOffset = 0;
+
+        floatingVideo.addEventListener("mousedown", dragStart);
+        document.addEventListener("mousemove", drag);
+        document.addEventListener("mouseup", dragEnd);
+
+        function dragStart(e) {
+            initialX = e.clientX - xOffset;
+            initialY = e.clientY - yOffset;
+
+            if (e.target === floatingVideo) {
+                isDragging = true;
+            }
+        }
+
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+
+                xOffset = currentX;
+                yOffset = currentY;
+
+                setTranslate(currentX, currentY, floatingVideo);
+            }
+        }
+
+        function dragEnd(e) {
+            initialX = currentX;
+            initialY = currentY;
+
+            isDragging = false;
+        }
+
+        function setTranslate(xPos, yPos, el) {
+            el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+        }
+
+        closeVideo.addEventListener('click', () => {
+            floatingVideo.style.display = 'none';
+        });
+
+        // Scroll-triggered chart animations
+        const charts = {
+            personalDetailsChart,
+            workExperienceChart,
+            tvSkillsChart,
+            awardsChart
+        };
+
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const chartId = entry.target.id;
+                    const chart = charts[chartId];
+                    if (chart && !chart.animated) {
+                        animateChart(chart);
+                        chart.animated = true;
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+
+        Object.values(charts).forEach(chart => {
+            observer.observe(chart.canvas);
+        });
+
+        function animateChart(chart) {
+            const data = chart.data.datasets[0].data;
+            const maxValue = Math.max(...data);
+            const step = maxValue / 100;
+            let currentValue = 0;
+
+            const animation = setInterval(() => {
+                currentValue += step;
+                chart.data.datasets[0].data = data.map(value => Math.min(value, currentValue));
+                chart.update();
+
+                if (currentValue >= maxValue) {
+                    clearInterval(animation);
+                }
+            }, 10);
+        }
+
+        // Audio control functionality
+        const audioControl = document.getElementById('audioControl');
+        let isMuted = false;
+
+        audioControl.addEventListener('click', () => {
+            const iframe = document.getElementById('youtubeVideo');
+            const player = new YT.Player(iframe);
+            
+            if (isMuted) {
+                player.unMute();
+                audioControl.innerHTML = '<i class="fas fa-volume-up"></i>';
+            } else {
+                player.mute();
+                audioControl.innerHTML = '<i class="fas fa-volume-mute"></i>';
+            }
+            
+            isMuted = !isMuted;
+        });
+
+        // Attempt to unmute the video
+        window.addEventListener('load', function() {
+            const iframe = document.getElementById('youtubeVideo');
+            if (iframe) {
+                const player = new YT.Player(iframe, {
+                    events: {
+                        'onReady': function(event) {
+                            event.target.unMute();
+                            event.target.setVolume(100);
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+
+    // Load YouTube API
+    <script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>
